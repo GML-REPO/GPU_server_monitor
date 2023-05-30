@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Server Monitor</title>
+    <style>
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      li {
+        margin-bottom: 10px;
+      }
+
+      .server-item {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+
+      .server-item input[type="text"] {
+        margin-right: 10px;
+      }
+
+      .delete-button {
+        margin-left: auto;
+        cursor: pointer;
+      }
+      .server-info {
+        /* margin-bottom: 20px; */
+        /* white-space: pre-wrap; */
+        white-space: break-spaces;
+        display: block;
+      }
+      .serverSmry-info {
+        /* margin-bottom: 20px; */
+        white-space: pre-wrap;
+        /* display: block; */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Server Monitor</h1>
+
+    <h2>Add Server</h2>
+    <div id="addServerForm">
+      <input type="text" id="ipAddress" placeholder="IP Address" />
+      <input type="text" id="portNumber" placeholder="Port Number" />
+      <button onclick="addServer()">Add</button>
+      <br><br>
+      Load Server List
+      <input type="file" id="fileInput" accept=".txt" title="Load Server List" />
+      <button onclick="saveServerList()">Save Server List</button>
+    </div>
+
+    <!-- <div id="summary"> -->
+    <h2>Summary</h2>
+    <ul id="serverSummary">
+      <!-- Server list items will be dynamically added here -->
+    </ul>
+    <!-- </div> -->
+
+    <h2>Server List</h2>
+    <ul id="serverList">
+      <!-- Server list items will be dynamically added here -->
+    </ul>
+
+    <div id="serverInfoBox">
+      <!-- Server information will be dynamically updated here -->
+    </div>
+
+    <script>
+      // Array to store the server list
+      var servers = [];
+      var cnt = 1;
+
+      // Function to add a new server to the list
+      function addServer() {
+        var ipAddress = document.getElementById("ipAddress").value;
+        var portNumber = document.getElementById("portNumber").value;
+
+        // Check if IP address and port number are provided
+        if (ipAddress && portNumber) {
+          var server = {
+            // id: toString(cnt),
+            ipAddress: ipAddress,
+            portNumber: portNumber,
+            sysInfo: "",
+            sysSmry: "",
+          };
+
+          servers.push(server);
+
+          // Clear the input fields
+          document.getElementById("ipAddress").value = "";
+          document.getElementById("portNumber").value = "";
+
+          // Update the server list
+          updateServerList();
+          cnt += 1;
+        }
+      }
+
+      function saveServerList() {
+        var save_text = "";
+        servers.forEach(function (server) {
+          var ip = server.ipAddress;
+          var port = server.portNumber;
+
+          save_text += ip + ":" + port + "\n";
+        });
+        var blob = new Blob([save_text], { type: "text/plain" });
+        var url = URL.createObjectURL(blob);
+
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = "local_server_list.txt";
+        link.click();
+      }
+
+      function loadVariablesFromText(file) {
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+          var contents = event.target.result;
+          var lines = contents.split("\n");
+          servers.splice(0, servers.length);
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            var parts = line.split(":");
+            console.info(parts)
+            var _ip = parts[0].trim();
+            var _port = parts[1].trim();
+
+            if (_ip && _port) {
+              var server = {
+                // id: toString(cnt),
+                ipAddress: _ip,
+                portNumber: _port,
+                sysInfo: "",
+                sysSmry: "",
+              };
+
+              servers.push(server);
+            }
+          }
+        };
+
+        reader.readAsText(file);
+      }
+
+      var fileInput = document.getElementById("fileInput");
+      fileInput.addEventListener("change", function (event) {
+        var file = event.target.files[0];
+        loadVariablesFromText(file);
+        updateServerList()
+      });
+
+      // Function to delete a server from the list
+      function deleteServer(index) {
+        servers.splice(index, 1);
+        updateServerList();
+      }
+
+      // Function to update the server list
+      function updateServerList() {
+        var serverList = document.getElementById("serverList");
+        var serverSmry = document.getElementById("serverSummary");
+
+        // Clear the existing server list
+        serverList.innerHTML = "";
+        serverSmry.innerHTML = "";
+
+        // Loop through the servers array and add server items to the list
+        for (var i = 0; i < servers.length; i++) {
+          var server = servers[i];
+
+          // Create the server item
+          var listItem = document.createElement("li");
+          listItem.classList.add("server-item");
+          var smryItem = document.createElement("li");
+          smryItem.classList.add("server-item");
+
+          // Create the input fields for IP address and port number
+          var ipAddressInput = document.createElement("input");
+          ipAddressInput.type = "text";
+          ipAddressInput.value = server.ipAddress;
+          ipAddressInput.setAttribute("data-index", i);
+          ipAddressInput.addEventListener("input", updateServerInfo);
+          ipAddressInput.disabled = true;
+
+          var portNumberInput = document.createElement("input");
+          portNumberInput.type = "text";
+          portNumberInput.value = server.portNumber;
+          portNumberInput.setAttribute("data-index", i);
+          portNumberInput.addEventListener("input", updateServerInfo);
+          portNumberInput.disabled = true;
+
+          // Create the delete button
+          var deleteButton = document.createElement("span");
+          deleteButton.textContent = "Delete";
+          deleteButton.classList.add("delete-button");
+          deleteButton.setAttribute("data-index", i);
+          deleteButton.addEventListener("click", function () {
+            var index = this.getAttribute("data-index");
+            deleteServer(index);
+          });
+
+          // var lineBreak = document.createElement('br');
+
+          var sysInfo = document.createElement("p");
+          sysInfo.classList.add("server-info");
+          sysInfo.setAttribute("data-index", i);
+          sysInfo.innerHTML = server.sysInfo;
+
+          var sysSmry = document.createElement("p");
+          sysSmry.classList.add("serverSmry-info");
+          sysSmry.setAttribute("data-index", i);
+          sysSmry.innerHTML = server.sysSmry;
+
+          // Craete thr system info box
+          // Append the input fields and delete button to the server item
+          // listItem.appendChild(ipAddressInput);
+          // listItem.appendChild(portNumberInput);
+          // listItem.appendChild(deleteButton);
+          listItem.appendChild(sysInfo);
+
+          smryItem.appendChild(ipAddressInput);
+          smryItem.appendChild(portNumberInput);
+          smryItem.appendChild(sysSmry);
+          smryItem.appendChild(deleteButton);
+
+          // Append the server item to the server list
+          serverList.appendChild(listItem);
+          serverSmry.appendChild(smryItem);
+        }
+      }
+
+      // Function to update the server information in the array
+      function updateServerInfo() {
+        var index = this.getAttribute("data-index");
+        // var field = this.id === 'ipAddress' ? 'ipAddress' : 'portNumber';
+        var field = this.id;
+        var value = this.value;
+
+        servers[index][field] = value;
+      }
+
+      function summarizeGPUinfo(data) {
+        var lines = data.split("<br>");
+        var n_GPUs = 0;
+        var active_GPUs = 0;
+        var boxes = "";
+        lines.forEach(function (line) {
+          if (line.includes("|")) {
+            var tokens = line.split("|");
+            n_GPUs += 1;
+            var lastPartExists =
+              tokens.length > 1 && tokens[tokens.length - 1].trim().length > 0;
+            active_GPUs += lastPartExists;
+
+            var lastPartValuesCount = lastPartExists
+              ? tokens[tokens.length - 1].trim().split(",").length
+              : 0;
+            var _box = lastPartExists ? "&#9632" : "&#9633";
+            boxes += _box;
+          }
+        });
+        var texts =
+          "GPU : " +
+          String(active_GPUs) +
+          " / " +
+          String(n_GPUs) +
+          " | " +
+          boxes;
+        // console.info(texts);
+        return texts;
+      }
+
+      function updateServers() {
+        // var serverElement = document.getElementById("serverInfoBox");;
+
+        // servers.forEach(function(server) {
+        for (var i = 0; i < servers.length; i++) {
+          (function (i) {
+            var server = servers[i];
+            var url =
+              "http://" +
+              server.ipAddress +
+              ":" +
+              server.portNumber +
+              "/system_info";
+            fetch(url)
+              .then((response) => response.json())
+              .then((data) => {
+                // var paragraph = document.createElement("p");
+                // paragraph.classList.add('server-info')
+                var serverInfo = "";
+                serverInfo += "<h2>" + server.ipAddress + "</h2>";
+                serverInfo +=
+                  "<strong>CPU Utilization:</strong>     " + data.cpu + "<br>";
+                serverInfo +=
+                  "<strong>Memory Usage:</strong> <br>" + data.mem + "<br>";
+                serverInfo +=
+                  "<strong>GPU Info:</strong> <br>" + data.gpu + "<br>";
+                serverInfo +=
+                  "======================================================================";
+
+                // Set the HTML content to the container element
+                // paragraph.innerHTML = serverInfo;
+                // serverElement.appendChild(paragraph);
+                server.sysInfo = serverInfo;
+                server.sysSmry =
+                  "-- CPU : " +
+                  data.cpu.replace("<br>", "").replace("\n", "") +
+                  " -- " +
+                  "MEM : " +
+                  data.mem.slice(8, 14) +
+                  " -- " +
+                  summarizeGPUinfo(data.gpu);
+              })
+              .catch((error) => console.log(error));
+          })(i);
+        }
+        // $serverElement.html(serverInfo);
+        updateServerList();
+      }
+
+      setInterval(updateServers, 2000);
+    </script>
+  </body>
+</html>
