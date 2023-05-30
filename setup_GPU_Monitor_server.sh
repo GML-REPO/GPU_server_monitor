@@ -4,10 +4,11 @@ read GPU_Monitor_python_path
 echo "Enter the path to local file will save: (default: /usr/local/bin)"
 read SAVE_PATH
 
-if [ -e "$SAVE_PATH" ]; then
+if [ -e "$SAVE_PATH" ] && [-n "$SAVE_PATH" ]; then
     echo "local file saved in :$SAVE_PATH"
 else
     echo "$SAVE_PATH is not exist. local file is saved in /usr/local/bin"
+    SAVE_PATH=/usr/local/bin
 fi
 
 if [ -e "$GPU_Monitor_python_path" ]; then
