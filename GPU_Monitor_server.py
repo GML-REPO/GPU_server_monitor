@@ -50,7 +50,9 @@ def get_mem_info():
     return mem_text
 
 def get_cpu_info():
-    return f'{psutil.cpu_percent()}%'
+    output = subprocess.check_output(['date'])
+    output = output.decode('utf-8').strip()
+    return f'{psutil.cpu_percent()}% | {output}'
 
 def get_gpu_info():
 
@@ -70,18 +72,19 @@ def get_gpu_info():
         gpu_mem_util = f'{float(gpu_mem_used) / float(gpu_mem_total) * 100:5.1f}'
 
         process_info = []
-        if len(output_proc) > 1:
+        if len(output_proc) > 0:
             for line_p in output_proc:
                 fields_p = line_p.split(',')
                 fields_p = [f.strip() for f in fields_p]
-                _gpu_uuid,_pid,_used_memory = fields_p
-                if gpu_uuid == _gpu_uuid:
-                    try:
-                        name_p = psutil.Process(int(_pid)).username()
-                    except:
-                        name_p = 'Unknown'
+                if len(fields_p) > 1:
+                    _gpu_uuid,_pid,_used_memory = fields_p
+                    if gpu_uuid == _gpu_uuid:
+                        try:
+                            name_p = psutil.Process(int(_pid)).username()
+                        except:
+                            name_p = 'Unknown'
 
-                    process_info += [f'{name_p}({_used_memory}MiB)']
+                        process_info += [f'{name_p}({_used_memory}MiB)']
 
         gpu_info.append({
             'driver_version':driver_version,

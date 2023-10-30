@@ -1,0 +1,9 @@
+[Unit]
+Description=Server GPU Monitor Service by GmL
+
+[Service]
+ExecStart=/home/gyeongmin/miniconda3/bin/python /GPU_Monitor/GPU_Monitor_server.py
+WorkingDirectory=/GPU_Monitor/
+
+[Install]
+WantedBy=default.target

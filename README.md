@@ -29,14 +29,16 @@ And follow the instruction from the prompt.
 
 To install GPU Monitor on your server, you need a superuser for Add Service.
 
-If you don't want or can't get permission, you can run a Python file on the server.
+If you don't want or can't get the permission, you can run a Python file on your server.
 
-in this case, you need to change some lines in the python file.
+in this case, you may need to change some lines in the python file.
 
 To check the process is running, 
 ```
 sudo systemctl status GPU_Monitor.service
 ```
+
+If you want to change the port, revise the python code.
 
 
 ## Usage
