@@ -14,14 +14,20 @@ web-browser for html
 ### Server-side
 
 ```
+nvidia-smi
+```
+
+```
 python3
+psutil
+subprocess
 flask
 flask_cors
 ```
 
 
 ## Installation
-### only for server
+### Server-side
 ```
 sudo bash setup_GPU_Monitor_server.sh
 ```
@@ -29,9 +35,7 @@ And follow the instruction from the prompt.
 
 To install GPU Monitor on your server, you need a superuser for Add Service.
 
-If you don't want or can't get the permission, you can run a Python file on your server.
-
-in this case, you may need to change some lines in the python file.
+If you don't want or can't get permission, run a python file directly on the server.
 
 To check the process is running, 
 ```

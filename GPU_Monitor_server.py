@@ -73,8 +73,17 @@ def get_gpu_info():
 
         process_info = []
         if len(output_proc) > 0:
+        if len(output_proc) > 0:
             for line_p in output_proc:
                 fields_p = line_p.split(',')
+                if len(fields_p) > 1:
+                    fields_p = [f.strip() for f in fields_p]
+                    _gpu_uuid,_pid,_used_memory = fields_p
+                    if gpu_uuid == _gpu_uuid:
+                        try:
+                            name_p = psutil.Process(int(_pid)).username()
+                        except:
+                            name_p = 'Unknown'
                 fields_p = [f.strip() for f in fields_p]
                 if len(fields_p) > 1:
                     _gpu_uuid,_pid,_used_memory = fields_p
@@ -84,6 +93,7 @@ def get_gpu_info():
                         except:
                             name_p = 'Unknown'
 
+                        process_info += [f'{name_p}({_used_memory}MiB)']
                         process_info += [f'{name_p}({_used_memory}MiB)']
 
         gpu_info.append({
