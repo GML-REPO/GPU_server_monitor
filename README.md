@@ -25,7 +25,6 @@ flask
 flask_cors
 ```
 
-
 ## Installation
 ### Server-side
 ```
@@ -33,16 +32,20 @@ sudo bash setup_GPU_Monitor_server.sh
 ```
 And follow the instruction from the prompt.
 
-To install GPU Monitor on your server, you need a superuser for Add Service.
+To install GPU Monitor on your server, you need a superuser permission to register Service.
 
-If you don't want or can't get permission, run a python file directly on the server.
+If you don't want or can't get a permission, run the python file directly on the server manually.
 
-To check the process is running, 
+To check the process(service) is running, 
 ```
 sudo systemctl status GPU_Monitor.service
 ```
 
-If you want to change the port, revise the python code.
+If you want to change some variables like port, update_rate, cuda_path, etc.,
+
+change the setting.txt in the save path(default:/usr/local/bin/GPU_Monitor/setting.txt)
+
+and then, restart the service or the python file.
 
 
 ## Usage
