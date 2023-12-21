@@ -11,6 +11,14 @@ else
     SAVE_PATH=/usr/local/bin
 fi
 
+echo "You can modify some variables like port, update rate, cuda_path and so on in the setting.txt file that in the save_path"
+SETUP_FILE=$SAVE_PATH/GPU_Monitor/setting.txt
+touch $SETUP_FILE
+echo "PORT:60022" >> $SETUP_FILE
+echo "UPDATE_RATE:2" >> $SETUP_FILE
+echo "CUDA_PATH:/usr/local" >> $SETUP_FILE
+echo "GPU_PREFIXES:NVIDIA,GeForce,Quadro,Tesla" >> $SETUP_FILE
+
 if [ -e "$GPU_Monitor_python_path" ]; then
     echo "python path set : $GPU_Monitor_python_path"
 
