@@ -144,4 +144,5 @@ def get_info():
 
 
 if __name__ == '__main__':
+    update_param()
     app.run(host='0.0.0.0', port=PORT)
