@@ -7,7 +7,7 @@ import time
 
 GPU_PREFIXES = ['NVIDIA', 'GeForce', 'Quadro']
 UPDATE_RATE = 2
-
+CUDA_PATH = '/usr/local'
 
 LAST_UPDATE = 0
 CPU_INFO = ''
@@ -22,6 +22,7 @@ def get_system_info():
     global LAST_UPDATE, CPU_INFO, MEM_INFO, GPU_INFO
     
     if time.time() - LAST_UPDATE > UPDATE_RATE:
+        update_param()
         get_info()
         LAST_UPDATE = time.time()
 
@@ -31,6 +32,19 @@ def get_system_info():
         'gpu': GPU_INFO
     }
     return jsonify(system_info)
+
+def update_param():
+    global UPDATE_RATE, CUDA_PATH, GPU_PREFIXES
+    try:
+        setting_file = open('/'.join(__file__.split('/')[:-1])+'/setting.txt', 'r')
+        lines = setting_file.readlines()
+        for line in lines:
+            key,value = line.split(':')
+            if key == 'UPDATE_RATE': UPDATE_RATE = value
+            elif key == 'CUDA_PATH': CUDA_PATH = value
+            elif key == 'GPU_PREFIXES': GPU_PREFIXES = value.split(',')
+    except: pass
+
 
 def get_mem_info():
     mem_percent = psutil.virtual_memory().percent
@@ -93,14 +107,14 @@ def get_gpu_info():
     
     cuda_text = []
     try:
-        nvcc_out = subprocess.check_output(['which', 'nvcc']).decode('utf-8').strip()
-        nvcc_out = subprocess.check_output(['ls', '-al', nvcc_out.replace('nvcc','')+'/../../']).decode('utf-8').strip()
-        for line in nvcc_out.split('\n'):
+        cuda_out = subprocess.check_output(['ls', '-al', CUDA_PATH]).decode('utf-8').strip()
+        for line in cuda_out.split('\n'):
             if 'cuda' in line:
                 cuda_text.append(''.join(line.split()[8:]))
-    except: pass
+        cuda_text = '*'+' | '.join(cuda_text)
+    except Exception as e: cuda_text = str(e)
 
-    gpu_text = [f'Driver version:{driver_version}'] + [f'CUDA: *{cuda_text[0]} | {cuda_text[1:]}'] + gpu_text
+    gpu_text = [f'Driver version:{driver_version}'] + [f'CUDA: {cuda_text}'] + gpu_text
     gpu_text = '\n'.join(gpu_text).replace('\n', '<br>')
     return gpu_text
 
