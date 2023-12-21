@@ -1,23 +1,16 @@
-
-echo "enter the python path which flask/flask_cors is installed: "
+echo "enter the python path which flask/flask_cors is installed:"
 read GPU_Monitor_python_path
 echo "Enter the path to local file will save: (default: /usr/local/bin)"
 read SAVE_PATH
 
 if [ -e "$SAVE_PATH" ] && [-n "$SAVE_PATH" ]; then
-    echo "local file saved in :$SAVE_PATH"
+    echo "local files will be saved in :$SAVE_PATH"
 else
     echo "$SAVE_PATH is not exist. local file is saved in /usr/local/bin"
     SAVE_PATH=/usr/local/bin
 fi
 
-echo "You can modify some variables like port, update rate, cuda_path and so on in the setting.txt file that in the save_path"
-SETUP_FILE=$SAVE_PATH/GPU_Monitor/setting.txt
-touch $SETUP_FILE
-echo "PORT:60022" >> $SETUP_FILE
-echo "UPDATE_RATE:2" >> $SETUP_FILE
-echo "CUDA_PATH:/usr/local" >> $SETUP_FILE
-echo "GPU_PREFIXES:NVIDIA,GeForce,Quadro,Tesla" >> $SETUP_FILE
+
 
 if [ -e "$GPU_Monitor_python_path" ]; then
     echo "python path set : $GPU_Monitor_python_path"
@@ -46,6 +39,18 @@ if [ -e "$GPU_Monitor_python_path" ]; then
     sudo systemctl enable GPU_Monitor.service
     sudo systemctl start GPU_Monitor.service
     sudo systemctl status GPU_Monitor.service
+    sudo systemctl restart GPU_Monitor.service
 else
     echo "$GPU_Monitor_python_path is not exist"
 fi
+
+echo "You can modify some variables like port, update rate, cuda_path and so on in the setting.txt file that in the save_path"
+touch ./setting.txt
+echo "PORT=60022" >> ./setting.txt
+echo "UPDATE_RATE=2" >> ./setting.txt
+echo "CUDA_PATH=/usr/local" >> ./setting.txt
+echo "GPU_PREFIXES=NVIDIA,GeForce,Quadro,Tesla" >> ./setting.txt
+sudo cp ./setting.txt $SAVE_PATH/GPU_Monitor/setting.txt
+rm ./setting.txt
+rm ./GPU_Monitor.service
+sudo systemctl restart GPU_Monitor.service

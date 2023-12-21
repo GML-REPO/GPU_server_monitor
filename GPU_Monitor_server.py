@@ -40,7 +40,8 @@ def update_param():
         setting_file = open('/'.join(__file__.split('/')[:-1])+'/setting.txt', 'r')
         lines = setting_file.readlines()
         for line in lines:
-            key,value = line.split(':')
+            key,value = line.split('=')[:2]
+            value=value.replace('\n', '')
             if key == 'UPDATE_RATE': UPDATE_RATE = int(value)
             elif key == 'CUDA_PATH': CUDA_PATH = value
             elif key == 'GPU_PREFIXES': GPU_PREFIXES = value.split(',')
@@ -113,10 +114,10 @@ def get_gpu_info():
         for line in cuda_out.split('\n'):
             if 'cuda' in line:
                 cuda_text.append(''.join(line.split()[8:]))
-        cuda_text = '*'+' | '.join(cuda_text)
+        cuda_text = '*'+' , '.join(cuda_text)
     except Exception as e: cuda_text = str(e)
 
-    gpu_text = [f'Driver version:{driver_version}'] + [f'CUDA: {cuda_text}'] + gpu_text
+    gpu_text = [f'Driver version:{driver_version} - CUDA: {cuda_text}'] + gpu_text
     gpu_text = '\n'.join(gpu_text).replace('\n', '<br>')
     return gpu_text
 
