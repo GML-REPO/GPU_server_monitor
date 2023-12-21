@@ -8,6 +8,7 @@ import time
 GPU_PREFIXES = ['NVIDIA', 'GeForce', 'Quadro']
 UPDATE_RATE = 2
 CUDA_PATH = '/usr/local'
+PORT = 60022
 
 LAST_UPDATE = 0
 CPU_INFO = ''
@@ -34,15 +35,16 @@ def get_system_info():
     return jsonify(system_info)
 
 def update_param():
-    global UPDATE_RATE, CUDA_PATH, GPU_PREFIXES
+    global UPDATE_RATE, CUDA_PATH, GPU_PREFIXES, PORT
     try:
         setting_file = open('/'.join(__file__.split('/')[:-1])+'/setting.txt', 'r')
         lines = setting_file.readlines()
         for line in lines:
             key,value = line.split(':')
-            if key == 'UPDATE_RATE': UPDATE_RATE = value
+            if key == 'UPDATE_RATE': UPDATE_RATE = int(value)
             elif key == 'CUDA_PATH': CUDA_PATH = value
             elif key == 'GPU_PREFIXES': GPU_PREFIXES = value.split(',')
+            elif key == 'PORT': PORT = int(value)
     except: pass
 
 
@@ -141,4 +143,4 @@ def get_info():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=60022)
+    app.run(host='0.0.0.0', port=PORT)
