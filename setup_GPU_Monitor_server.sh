@@ -46,7 +46,7 @@ fi
 
 echo "You can modify some variables like port, update rate, cuda_path and so on in the setting.txt file that in the save_path"
 touch ./setting.txt
-echo "PORT=60022" >> ./setting.txt
+echo "PORT=60023" >> ./setting.txt
 echo "UPDATE_RATE=2" >> ./setting.txt
 echo "CUDA_PATH=/usr/local" >> ./setting.txt
 echo "GPU_PREFIXES=NVIDIA,GeForce,Quadro,Tesla" >> ./setting.txt
